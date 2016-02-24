@@ -12,7 +12,7 @@
  */
 
 /**
- * Prevent switching to Twenty Sixteen on old versions of WordPress.
+ * Prevent switching to Twenty Sixteen on unsupported versions of WordPress.
  *
  * Switches to the default theme.
  *
@@ -29,41 +29,51 @@ add_action( 'after_switch_theme', 'twentysixteen_switch_theme' );
  * Add message for unsuccessful theme switch.
  *
  * Prints an update nag after an unsuccessful attempt to switch to
- * Twenty Sixteen on WordPress versions prior to 4.3.
+ * Twenty Sixteen on unsupported versions of WordPress.
  *
  * @since Twenty Sixteen 1.0
- *
- * @global string $wp_version
  */
 function twentysixteen_upgrade_notice() {
-	$message = sprintf( __( 'Twenty Sixteen requires at least WordPress version 4.3. You are running version %s. Please upgrade and try again.', 'twentysixteen' ), $GLOBALS['wp_version'] );
-	printf( '<div class="error"><p>%s</p></div>', $message );
+	printf( '<div class="error"><p>%s</p></div>', twentysixteen_minimum_required_version_message() );
 }
 
 /**
- * Prevent the Customizer from being loaded on WordPress versions prior to 4.3.
+ * Prevents the Customizer from being loaded on unsupported versions of WordPress.
  *
  * @since Twenty Sixteen 1.0
- *
- * @global string $wp_version
  */
 function twentysixteen_customize() {
-	wp_die( sprintf( __( 'Twenty Sixteen requires at least WordPress version 4.3. You are running version %s. Please upgrade and try again.', 'twentysixteen' ), $GLOBALS['wp_version'] ), '', array(
+	wp_die( twentysixteen_minimum_required_version_message(), '', array(
 		'back_link' => true,
 	) );
 }
 add_action( 'load-customize.php', 'twentysixteen_customize' );
 
 /**
- * Prevent the Theme Preview from being loaded on WordPress versions prior to 4.3.
+ * Prevents the Theme Preview from being loaded on unsupported versions of WordPress.
  *
  * @since Twenty Sixteen 1.0
- *
- * @global string $wp_version
  */
 function twentysixteen_preview() {
 	if ( isset( $_GET['preview'] ) ) {
-		wp_die( sprintf( __( 'Twenty Sixteen requires at least WordPress version 4.3. You are running version %s. Please upgrade and try again.', 'twentysixteen' ), $GLOBALS['wp_version'] ) );
+		wp_die( twentysixteen_minimum_required_version_message() );
 	}
 }
 add_action( 'template_redirect', 'twentysixteen_preview' );
+
+/**
+ * Minimum required WordPress version message.
+ *
+ * @since Twenty Fifteen 1.2
+ *
+ * @global string $wp_version WordPress version.
+ * @return string
+ */
+function twentysixteen_minimum_required_version_message() {
+	$message = sprintf(
+		/* translators: %s: WordPress version */
+		__( 'Twenty Sixteen requires at least WordPress version 4.4. You are running version %s. Please upgrade and try again.', 'twentysixteen' ),
+		$GLOBALS['wp_version']
+	);
+	return $message;
+}
